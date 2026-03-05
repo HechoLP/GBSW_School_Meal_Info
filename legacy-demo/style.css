@@ -1,0 +1,108 @@
+/* style.css */
+
+/* Mesh Gradient Background */
+/* Light Mode: 밝은 민트/스카이 톤으로 산뜻함 유지 */
+.mesh-bg {
+    background-color: #f8fafc; /* slate-50 */
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(45, 212, 191, 0.2) 0px, transparent 60%),     /* teal-400 increased opacity */
+        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.1) 0px, transparent 60%),   /* violet-400 */
+        radial-gradient(at 100% 100%, rgba(52, 211, 153, 0.2) 0px, transparent 60%), /* emerald-400 increased opacity */
+        radial-gradient(at 0% 100%, rgba(56, 189, 248, 0.15) 0px, transparent 60%);    /* sky-400 */
+    background-attachment: fixed;
+    transition: background 0.3s ease;
+}
+
+/* Dark Mode: 기존의 깊은 Slate/Violet 톤 복원 */
+html.dark .mesh-bg {
+    background-color: #0f172a; /* slate-900 */
+    background-image: 
+        radial-gradient(at 0% 0%, rgba(79, 70, 229, 0.15) 0px, transparent 60%),
+        radial-gradient(at 100% 0%, rgba(139, 92, 246, 0.15) 0px, transparent 60%),
+        radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 60%),
+        radial-gradient(at 0% 100%, rgba(225, 29, 72, 0.08) 0px, transparent 60%);
+}
+
+/* Glassmorphism Card Style */
+.glass-card {
+    /* Light Mode: 테두리를 더 선명하게 하여 흰색 배경과 구분 */
+    background-color: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(226, 232, 240, 0.8); /* slate-200 stronger border */
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 24px rgba(15, 23, 42, 0.06); /* slight darker shadow */
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Dark Mode Card Override */
+html.dark .glass-card {
+    background-color: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+}
+
+html.dark .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.5); /* slate-400 */
+    border-radius: 10px;
+}
+
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(100, 116, 139, 0.7);
+}
+
+html.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Active Tab Style Override */
+.meal-tab-button.active {
+    background-color: #ffffff;
+    border: 1px solid rgba(226, 232, 240, 1);
+    color: #0f172a;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+html.dark .meal-tab-button.active {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+/* Allergy Warning Highlight */
+.allergy-warning-item {
+    background-color: rgba(254, 226, 226, 0.8) !important; /* red-100 strong */
+    border-color: rgba(248, 113, 113, 0.5) !important;     /* red-400 */
+}
+
+html.dark .allergy-warning-item {
+    background-color: rgba(225, 29, 72, 0.08) !important;
+    border-color: rgba(225, 29, 72, 0.3) !important;
+}
+
+.allergy-warning-text {
+    color: #e11d48 !important; /* rose-600 */
+}
+
+html.dark .allergy-warning-text {
+    color: #f43f5e !important; /* rose-500 */
+}

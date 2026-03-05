@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>경북소마고 스마트 급식 대시보드</title>
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Pretendard', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        slate: {
+                            50: '#f8fafc',
+                            100: '#f1f5f9',
+                            200: '#e2e8f0',
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        },
+                        teal: {
+                            400: '#2dd4bf',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                        }
+                    },
+                    animation: {
+                        'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                    },
+                    keyframes: {
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Pretendard Font -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-white min-h-screen font-sans antialiased mesh-bg p-4 md:p-8 overflow-x-hidden transition-colors duration-300">
+    <div class="max-w-4xl mx-auto space-y-6">
+        
+        <!-- 헤더 영역 -->
+        <header class="flex justify-between items-center opacity-0 animate-fade-in-up" style="animation-delay: 0.1s;">
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">경북소마고 급식</h1>
+                <p class="text-slate-500 dark:text-slate-400 text-sm mt-1" id="current-date-display">오늘의 식단을 확인하세요</p>
+            </div>
+            <div class="flex gap-2">
+                <button id="theme-toggle-button" class="p-3 rounded-full bg-white/60 dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-white dark:hover:bg-white/10 transition-all active:scale-95 shadow-sm" aria-label="테마 변경">
+                    <i data-lucide="moon" class="w-5 h-5 text-slate-600 dark:text-slate-300 hidden dark:block"></i>
+                    <i data-lucide="sun" class="w-5 h-5 text-slate-600 dark:text-slate-300 block dark:hidden"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- 메인 콘텐츠 (Bento Grid) -->
+        <main class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            <!-- 실시간 급식실 혼잡도 카드 -->
+            <section class="glass-card md:col-span-12 opacity-0 animate-fade-in-up" style="animation-delay: 0.2s;">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h2 class="text-lg font-semibold flex items-center gap-2 text-slate-800 dark:text-white">
+                            <i data-lucide="users" class="w-5 h-5 text-teal-500 dark:text-indigo-400"></i>
+                            실시간 급식실 혼잡도
+                        </h2>
+                        <p class="text-slate-500 dark:text-slate-400 text-sm mt-1">현재 <span id="current-people-count" class="font-bold text-slate-900 dark:text-white text-lg">0</span>명 이용 중</p>
+                    </div>
+                    <div id="congestion-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-teal-100 dark:bg-emerald-500/20 text-teal-700 dark:text-emerald-400 border border-teal-200 dark:border-emerald-500/30">
+                        쾌적
+                    </div>
+                </div>
+                
+                <div class="relative h-4 bg-slate-200 dark:bg-slate-800/80 rounded-full overflow-hidden mb-2 shadow-inner dark:shadow-none">
+                    <div id="congestion-progress-bar" class="absolute top-0 left-0 h-full w-0 bg-gradient-to-r from-teal-400 to-teal-500 dark:from-emerald-400 dark:to-emerald-500 transition-all duration-1000 ease-out"></div>
+                </div>
+                <div class="flex justify-between text-xs text-slate-500 dark:text-slate-400">
+                    <span>예상 대기시간: <span id="estimated-wait-time" class="text-slate-800 dark:text-white font-medium">0분</span></span>
+                    <span>총 300석</span>
+                </div>
+            </section>
+
+            <!-- 급식 타임라인 및 메뉴 카드 -->
+            <section class="glass-card md:col-span-7 flex flex-col opacity-0 animate-fade-in-up" style="animation-delay: 0.3s;">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-lg font-semibold flex items-center gap-2 text-slate-800 dark:text-white">
+                        <i data-lucide="utensils" class="w-5 h-5 text-teal-500 dark:text-violet-400"></i>
+                        오늘의 식단
+                    </h2>
+                    
+                    <!-- 끼니 전환 탭 -->
+                    <div class="flex bg-slate-200/50 dark:bg-slate-800/50 p-1 rounded-2xl border border-slate-200 dark:border-white/5">
+                        <button class="meal-tab-button px-4 py-1.5 rounded-xl text-sm font-medium transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white" data-meal-type="breakfast">조식</button>
+                        <button class="meal-tab-button active px-4 py-1.5 rounded-xl text-sm font-medium transition-all text-slate-800 dark:text-white" data-meal-type="lunch">중식</button>
+                        <button class="meal-tab-button px-4 py-1.5 rounded-xl text-sm font-medium transition-all text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white" data-meal-type="dinner">석식</button>
+                    </div>
+                </div>
+
+                <!-- 식단 리스트 -->
+                <ul id="meal-menu-list" class="space-y-3 flex-1">
+                    <!-- 자바스크립트로 동적 렌더링 -->
+                </ul>
+            </section>
+
+            <!-- 인터랙티브 요소 (평점 및 투표) -->
+            <section class="md:col-span-5 flex flex-col gap-6 opacity-0 animate-fade-in-up" style="animation-delay: 0.4s;">
+                
+                <!-- 식단 평점 기능 -->
+                <div class="glass-card flex-1">
+                    <h2 class="text-lg font-semibold flex items-center gap-2 mb-4 text-slate-800 dark:text-white">
+                        <i data-lucide="star" class="w-5 h-5 text-amber-400 dark:text-yellow-400"></i>
+                        오늘의 식단 어땠나요?
+                    </h2>
+                    <div class="flex justify-center gap-2 mb-3 mt-6" id="star-rating-container">
+                        <button class="star-btn text-slate-300 dark:text-slate-600 hover:text-amber-400 dark:hover:text-yellow-400 transition-colors transform active:scale-75 duration-200" data-rating="1"><i data-lucide="star" class="w-8 h-8 fill-current"></i></button>
+                        <button class="star-btn text-slate-300 dark:text-slate-600 hover:text-amber-400 dark:hover:text-yellow-400 transition-colors transform active:scale-75 duration-200" data-rating="2"><i data-lucide="star" class="w-8 h-8 fill-current"></i></button>
+                        <button class="star-btn text-slate-300 dark:text-slate-600 hover:text-amber-400 dark:hover:text-yellow-400 transition-colors transform active:scale-75 duration-200" data-rating="3"><i data-lucide="star" class="w-8 h-8 fill-current"></i></button>
+                        <button class="star-btn text-slate-300 dark:text-slate-600 hover:text-amber-400 dark:hover:text-yellow-400 transition-colors transform active:scale-75 duration-200" data-rating="4"><i data-lucide="star" class="w-8 h-8 fill-current"></i></button>
+                        <button class="star-btn text-slate-300 dark:text-slate-600 hover:text-amber-400 dark:hover:text-yellow-400 transition-colors transform active:scale-75 duration-200" data-rating="5"><i data-lucide="star" class="w-8 h-8 fill-current"></i></button>
+                    </div>
+                    <p class="text-center text-sm text-slate-500 dark:text-slate-400 font-medium h-5" id="rating-feedback-text">평점을 남겨주세요</p>
+                </div>
+
+                <!-- 다음 주 특식 투표 기능 -->
+                <div class="glass-card flex-1">
+                    <h2 class="text-lg font-semibold flex items-center gap-2 mb-4 text-slate-800 dark:text-white">
+                        <i data-lucide="check-circle" class="w-5 h-5 text-teal-500 dark:text-blue-400"></i>
+                        다음 주 특식 투표
+                    </h2>
+                    <div class="space-y-3 mt-4" id="voting-container">
+                        <!-- 투표 항목 1 -->
+                        <div class="relative group cursor-pointer vote-option" data-option-id="malatang">
+                            <div class="absolute inset-0 bg-slate-100 dark:bg-slate-800/50 rounded-xl overflow-hidden">
+                                <div class="vote-progress-bar h-full bg-teal-500/10 dark:bg-blue-500/20 w-0 transition-all duration-1000 ease-out"></div>
+                            </div>
+                            <div class="relative p-3 flex justify-between items-center border border-slate-200/60 dark:border-white/5 rounded-xl group-hover:border-teal-400/50 dark:group-hover:border-blue-400/30 transition-all transform active:scale-[0.98]">
+                                <span class="font-medium text-sm text-slate-800 dark:text-white">마라탕 & 꿔바로우</span>
+                                <span class="text-xs text-teal-600 dark:text-blue-300 font-bold vote-percentage opacity-0 transition-opacity">0%</span>
+                            </div>
+                        </div>
+                        <!-- 투표 항목 2 -->
+                        <div class="relative group cursor-pointer vote-option" data-option-id="rosechicken">
+                            <div class="absolute inset-0 bg-slate-100 dark:bg-slate-800/50 rounded-xl overflow-hidden">
+                                <div class="vote-progress-bar h-full bg-teal-500/10 dark:bg-blue-500/20 w-0 transition-all duration-1000 ease-out"></div>
+                            </div>
+                            <div class="relative p-3 flex justify-between items-center border border-slate-200/60 dark:border-white/5 rounded-xl group-hover:border-teal-400/50 dark:group-hover:border-blue-400/30 transition-all transform active:scale-[0.98]">
+                                <span class="font-medium text-sm text-slate-800 dark:text-white">로제 찜닭 & 주먹밥</span>
+                                <span class="text-xs text-teal-600 dark:text-blue-300 font-bold vote-percentage opacity-0 transition-opacity">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 투표 완료 토스트 메시지 -->
+                    <div id="vote-toast" class="mt-4 flex items-center gap-2 px-4 py-3 rounded-xl bg-teal-50 dark:bg-teal-500/10 border border-teal-200 dark:border-teal-500/20 opacity-0 translate-y-2 transition-all duration-300 pointer-events-none hidden">
+                        <i data-lucide="check" class="w-4 h-4 text-teal-600 dark:text-teal-400"></i>
+                        <span class="text-sm font-medium text-teal-700 dark:text-teal-300">투표가 완료되었습니다!</span>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- 영양정보 모달 (추가됨) -->
+    <div id="nutrition-modal" class="fixed inset-0 bg-slate-900/40 dark:bg-slate-900/60 backdrop-blur-sm z-50 hidden flex justify-center items-end md:items-center p-0 md:p-4 transition-opacity">
+        <div class="glass-card w-full md:max-w-sm bg-white md:bg-white/95 dark:bg-slate-900/95 dark:md:bg-slate-800/90 rounded-t-[2rem] md:rounded-[2rem] p-6 pb-10 md:pb-8 transform transition-transform border border-slate-200/50 dark:border-white/10 translate-y-full md:translate-y-4 md:opacity-0 transition-all duration-300" id="nutrition-modal-content">
+            <div class="w-12 h-1.5 bg-slate-300 dark:bg-white/20 rounded-full mx-auto mb-6 md:hidden"></div>
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <span class="text-teal-500 dark:text-indigo-400 text-xs font-bold tracking-wider uppercase mb-1 block">Nutrition Facts</span>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white leading-tight" id="nutrition-food-name">음식 이름</h2>
+                </div>
+                <button id="close-nutrition-modal" class="text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors p-2 rounded-full hover:bg-slate-100 dark:hover:bg-white/10 active:scale-95 -mr-2 -mt-2">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="flex justify-between items-center p-4 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5">
+                    <span class="text-slate-500 dark:text-slate-400 font-medium">열량 (Energy)</span>
+                    <span class="text-xl font-bold text-slate-800 dark:text-white"><span id="nutrition-kcal">0</span></span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="p-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 text-center">
+                        <span class="text-xs text-slate-400 block mb-1">탄수화물</span>
+                        <span class="text-lg font-bold text-slate-800 dark:text-white" id="nutrition-carbs">0g</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 text-center">
+                        <span class="text-xs text-slate-400 block mb-1">단백질</span>
+                        <span class="text-lg font-bold text-slate-800 dark:text-white" id="nutrition-protein">0g</span>
+                    </div>
+                    <div class="p-3 bg-slate-50 dark:bg-white/5 rounded-2xl border border-slate-100 dark:border-white/5 text-center">
+                        <span class="text-xs text-slate-400 block mb-1">지방</span>
+                        <span class="text-lg font-bold text-slate-800 dark:text-white" id="nutrition-fat">0g</span>
+                    </div>
+                </div>
+
+                <!-- 알레르기 정보 섹션 추가 -->
+                <div class="mt-4 pt-4 border-t border-slate-100 dark:border-white/5">
+                    <span class="text-xs text-slate-400 block mb-2 font-medium">알레르기 정보</span>
+                    <div id="nutrition-allergies" class="flex flex-wrap gap-2">
+                        <!-- 자바스크립트로 동적 렌더링 -->
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-center text-xs text-slate-400 mt-6">* 제공되는 영양정보는 추정치이며 실제와 다를 수 있습니다.</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#1b2a57" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="스마트 급식실" />
+  <title>스마트 급식실 대시보드</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=SUIT:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body class="mobile-view-dashboard">
+  <div class="background-shape background-a"></div>
+  <div class="background-shape background-b"></div>
+
+  <div class="page">
+    <header class="topbar card">
+      <div>
+        <p class="eyebrow">GBSW SMART CAFETERIA</p>
+        <h1>학교 급식 통합 대시보드</h1>
+        <p class="sub" id="current-date">-</p>
+      </div>
+
+      <div class="top-actions">
+        <div class="auth-chip" id="auth-user">로그인 상태 확인중</div>
+        <button class="button solid" id="auth-action" type="button">Google 로그인</button>
+        <div class="live-chip disconnected" id="socket-status">미연결됨</div>
+        <button class="button ghost" id="allergy-settings-open" type="button">알레르기 설정</button>
+        <button class="button ghost install-button" id="app-install" type="button" hidden>앱 설치</button>
+        <button class="button ghost" id="theme-toggle" type="button">테마 전환</button>
+      </div>
+    </header>
+
+    <main class="grid app-main" id="app-main">
+      <section class="card congestion-card offline app-panel panel-dashboard">
+        <div class="congestion-unavailable" id="congestion-unavailable">실시간 정보를 얻을 수 없음</div>
+        <div class="section-head">
+          <div>
+            <h2>실시간 급식실 혼잡도</h2>
+            <p class="sub">라즈베리파이 센서 이벤트 기반</p>
+          </div>
+          <span class="status-badge" id="congestion-badge">쾌적</span>
+        </div>
+
+        <div class="congestion-main">
+          <div class="big-count">현재 <strong><span id="current-count">0</span>명</strong> 이용 중</div>
+          <div class="progress-wrap">
+            <div class="progress-bar" id="progress-bar"></div>
+          </div>
+          <div class="meta-row congestion-meta">
+            <span>예상 대기시간 <strong id="wait-minutes">0분</strong></span>
+            <span>총 좌석 <strong id="max-capacity">132석</strong></span>
+          </div>
+          <div class="meta-row tiny">
+            <span id="sensor-info">최근 센서 이벤트: 없음</span>
+            <span id="updated-at">업데이트: -</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="card meals-card app-panel panel-meals">
+        <div class="section-head inline">
+          <h2 id="meal-title">오늘의 식단</h2>
+          <div class="tabs" id="meal-tabs">
+            <button class="tab active" data-meal-type="breakfast" type="button">조식</button>
+            <button class="tab" data-meal-type="lunch" type="button">중식</button>
+            <button class="tab" data-meal-type="dinner" type="button">석식</button>
+          </div>
+        </div>
+        <div class="date-controls" aria-label="급식 날짜 선택">
+          <button class="button ghost date-nav" id="date-prev" type="button" aria-label="이전 날짜">&lt;</button>
+          <input class="date-input" id="meal-date-picker" type="date" />
+          <button class="button ghost date-nav" id="date-next" type="button" aria-label="다음 날짜">&gt;</button>
+          <button class="button ghost date-today" id="date-today" type="button">오늘</button>
+        </div>
+
+        <div class="meta-row tiny">
+          <span id="meal-source">급식 데이터: -</span>
+          <span id="meal-summary">메뉴 요약: -</span>
+        </div>
+
+        <ul class="meal-list" id="meal-list"></ul>
+      </section>
+
+      <aside class="right-col">
+        <section class="card app-panel panel-engage">
+          <h2>식단 만족도</h2>
+          <p class="sub">평점은 오늘 기준으로 저장되며 자정에 다음 날짜로 전환됩니다.</p>
+
+          <div class="stars" id="star-buttons">
+            <button type="button" data-score="1">★</button>
+            <button type="button" data-score="2">★</button>
+            <button type="button" data-score="3">★</button>
+            <button type="button" data-score="4">★</button>
+            <button type="button" data-score="5">★</button>
+          </div>
+          <p class="rating-feedback" id="rating-feedback">별점을 선택해주세요.</p>
+
+          <p class="rating-text" id="rating-summary">평점 데이터 로딩 중...</p>
+          <p class="micro-hint">별점은 언제든 수정 가능하며 1인 1표로 집계됩니다.</p>
+        </section>
+
+        <section class="card app-panel panel-engage">
+          <h2 id="vote-title">다음 주 특식 투표</h2>
+          <p class="sub">투표는 오늘 기준으로 1인 1표가 유지됩니다.</p>
+          <div class="vote-list" id="vote-list"></div>
+          <p class="rating-text" id="vote-total">총 0표</p>
+        </section>
+
+        <section class="card small-note app-panel panel-settings">
+          <h3>운영 포인트</h3>
+          <p>센서 장치와 서버는 같은 네트워크에 두고, `SENSOR_AUTH_TOKEN`으로 인증을 고정하세요.</p>
+        </section>
+      </aside>
+    </main>
+
+    <nav class="app-bottom-nav" id="app-bottom-nav" aria-label="모바일 화면 전환">
+      <button class="app-bottom-tab active" data-view="dashboard" type="button">대시보드</button>
+      <button class="app-bottom-tab" data-view="meals" type="button">식단</button>
+      <button class="app-bottom-tab" data-view="engage" type="button">참여</button>
+      <button class="app-bottom-tab" data-view="settings" type="button">설정</button>
+    </nav>
+  </div>
+
+  <div class="modal nutrition-modal hidden" id="nutrition-modal">
+    <div class="modal-content card">
+      <div class="section-head inline">
+        <div>
+          <h2 id="nutrition-title">메뉴 상세</h2>
+          <p class="sub" id="nutrition-scope">메뉴 상세 정보</p>
+        </div>
+        <button class="button ghost" id="nutrition-close" type="button">닫기</button>
+      </div>
+
+      <div class="nutri-grid">
+        <div>
+          <p class="label">끼니</p>
+          <p id="detail-meal-label">-</p>
+        </div>
+        <div>
+          <p class="label">식단 기준일</p>
+          <p id="detail-request-date">-</p>
+        </div>
+        <div>
+          <p class="label">실제 제공일</p>
+          <p id="detail-resolved-date">-</p>
+        </div>
+        <div>
+          <p class="label">데이터 출처</p>
+          <p id="detail-source">-</p>
+        </div>
+      </div>
+      <p class="label">알레르기</p>
+      <div class="allergy-tags" id="nutrition-allergies"></div>
+    </div>
+  </div>
+
+  <div class="modal hidden" id="allergy-modal">
+    <div class="modal-content card">
+      <div class="section-head inline">
+        <h2>내 알레르기 설정</h2>
+        <button class="button ghost" id="allergy-close" type="button">닫기</button>
+      </div>
+      <p class="sub">선택한 항목과 충돌하는 메뉴는 빨간색으로 강조됩니다.</p>
+      <div class="allergy-grid" id="allergy-grid"></div>
+      <button class="button solid" id="allergy-save" type="button">저장</button>
+    </div>
+  </div>
+
+  <button class="top-scroll-button" id="top-scroll-button" type="button" aria-label="맨 위로 이동">↑ 맨 위로</button>
+  <div class="login-required-banner hidden" id="login-required-banner" aria-live="assertive"></div>
+  <div class="toast" id="toast" aria-live="polite"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+  "congestion": {
+    "currentCount": 0,
+    "maxCapacity": 300,
+    "updatedAt": "2026-03-04T12:53:54.643Z",
+    "lastSensorEvent": {
+      "eventType": "exit",
+      "sensorId": "manual-test",
+      "amount": 1,
+      "eventAt": "2026-03-04T12:53:54.643Z",
+      "previous": 1,
+      "currentCount": 0
+    },
+    "recentEvents": [
+      {
+        "eventType": "entry",
+        "sensorId": "manual-test",
+        "amount": 1,
+        "eventAt": "2026-03-04T12:53:51.719Z",
+        "previous": 0,
+        "currentCount": 1
+      },
+      {
+        "eventType": "exit",
+        "sensorId": "manual-test",
+        "amount": 1,
+        "eventAt": "2026-03-04T12:53:54.643Z",
+        "previous": 1,
+        "currentCount": 0
+      }
+    ]
+  }
+}
