@@ -1271,8 +1271,7 @@ body.dark .login-required-banner {
     display: none;
   }
 
-  body.mobile-view-dashboard .panel-dashboard,
-  body.mobile-view-dashboard .panel-settings {
+  body.mobile-view-dashboard .panel-dashboard {
     display: block;
   }
 
@@ -1286,6 +1285,16 @@ body.dark .login-required-banner {
 
   body.mobile-view-settings .panel-settings {
     display: block;
+  }
+
+  body.mobile-view-dashboard .right-col,
+  body.mobile-view-meals .right-col {
+    display: none;
+  }
+
+  body.mobile-view-engage .right-col,
+  body.mobile-view-settings .right-col {
+    display: grid;
   }
 
   .congestion-card {
